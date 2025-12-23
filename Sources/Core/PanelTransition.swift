@@ -18,7 +18,7 @@ import QuartzCore
 /// A closure that configures properties on an NSPanel instance.
 public typealias PanelConfigurator = @MainActor @Sendable (NSPanel) -> Void
 
-/// Defines the duration and  timing curve for an animation.
+/// Defines the duration and timing curve for an animation.
 public struct PanelPresentationTiming: Sendable {
     public let duration: TimeInterval
     public let curve: CAMediaTimingFunctionName
@@ -29,7 +29,7 @@ public struct PanelPresentationTiming: Sendable {
     }
 }
 
-/// Defines Hidden and Visible states and the transition between they.
+/// Defines Hidden and Visible states and the transition between them.
 public struct PanelPresentation: Sendable {
         
     /// Configures the panel Hidden state.
