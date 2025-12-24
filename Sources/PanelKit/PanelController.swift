@@ -19,7 +19,7 @@ import SwiftUI
 /// The orchestrator that manages the system window (`NSPanel`) lifecycle and geometry.
 @MainActor
 public class PanelController<Style: PanelStyle> {
-        
+    
     /// The style blueprint defining behavior and appearance.
     public let style: Style
     
@@ -33,7 +33,7 @@ public class PanelController<Style: PanelStyle> {
     public var state: PanelState {
         bridge.currentState
     }
-        
+    
     public init(style: Style, content: AnyView) {
         self.style = style
         
@@ -55,7 +55,7 @@ public class PanelController<Style: PanelStyle> {
         // Calculate initial size and position
         performLayout()
     }
-        
+    
     public func present() {
         guard !state.isOpen && !state.isAnimating else { return }
         
@@ -106,9 +106,13 @@ public class PanelController<Style: PanelStyle> {
             self.bridge.updateState(to: .hidden)
         }
     }
-        
+    
     private func performLayout() {
-        guard let screen = NSScreen.main else { return }
+        guard let screen = NSScreen.main else {
+            debugPrint("⚠️ PanelKit Error: Attempted to perform layout but NSScreen.main is nil.")
+            assertionFailure("PanelKit: Layout calculation failed. NSScreen.main is required.")
+            return
+        }
         
         // 1. Determine Target Size
         var targetSize: CGSize
