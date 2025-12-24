@@ -12,7 +12,6 @@
 //                      `
 //
 
-// Sources/Core/PanelController.swift
 import AppKit
 import SwiftUI
 
