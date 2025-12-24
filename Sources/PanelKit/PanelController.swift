@@ -131,7 +131,13 @@ public class PanelController<Style: PanelStyle> {
             
             let width = min(fittingSize.width, maxWidth ?? screen.frame.width)
             let height = min(fittingSize.height, maxHeight ?? screen.frame.height)
-            targetSize = CGSize(width: width, height: height)
+            
+            // Ensure minimum viable size
+            let minSize: CGFloat = 1.0
+            targetSize = CGSize(
+                width: max(width, minSize),
+                height: max(height, minSize)
+            )
         }
         
         // 2. Determine Origin (Position)
