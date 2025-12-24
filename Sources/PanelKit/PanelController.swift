@@ -57,7 +57,7 @@ public class PanelController<Style: PanelStyle> {
     }
         
     public func present() {
-        guard !state.isOpen else { return }
+        guard !state.isOpen && !state.isAnimating else { return }
         
         // 1. Update State -> .appearing
         // Triggers SwiftUI animations (via Bridge)
@@ -85,7 +85,7 @@ public class PanelController<Style: PanelStyle> {
     }
     
     public func dismiss() {
-        guard state.isOpen else { return }
+        guard state.isOpen && !state.isAnimating else { return }
         
         // 1. Update State -> .dismissing
         bridge.updateState(to: .dismissing)
