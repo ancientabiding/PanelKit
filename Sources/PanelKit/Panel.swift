@@ -43,8 +43,9 @@ public class Panel: NSPanel {
         self.hidesOnDeactivate = configuration.hidesOnDeactivate
         self._canBecomeKey = configuration.canBecomeKey
         
-        // Prevents the panel from being released when closed
+        // Prevent automatic release when closed to allow reuse
         self.isReleasedWhenClosed = false
+        // Prevent hiding via Cmd+H to maintain explicit lifecycle control
         self.canHide = false
     }
 }
