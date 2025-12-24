@@ -49,6 +49,8 @@ public class PanelController<Style: PanelStyle> {
         self.panel.contentViewController = bridge.sizingBridge
         
         // 4. Initial Setup
+        // Set initial lifecycle state
+        bridge.updateState(to: .hidden)
         // Apply the "Hidden" visual state immediately
         style.presentation.hiddenState(panel)
         
@@ -154,8 +156,7 @@ public class PanelController<Style: PanelStyle> {
             targetOrigin = point
             
         case .ignore:
-            targetOrigin = panel.frame.origin
-            if style.sizing == .fullScreen { targetOrigin = .zero }
+            targetOrigin = (style.sizing == .fullScreen) ? .zero : panel.frame.origin
         }
         
         // 3. Apply Frame
