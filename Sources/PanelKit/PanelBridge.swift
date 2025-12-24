@@ -1,0 +1,70 @@
+//
+//  PanelBridge.swift
+//  FullScreenPanel
+//
+//
+//                     -(]-
+//                      (\ _  ._~''
+//           ,_  _,.--..( ,_.+  (`\
+//     -~.__--=_/'(    ` ) /  (  `'   JG
+//              ,_/ \ /'.__,. ).
+//           `_/     `\_  ._/ ` \ ,
+//                      `
+//
+
+import SwiftUI
+import Combine
+
+/// Encapsulates the interaction between AppKit and SwiftUI.
+/// Responsible for hosting the view, managing reactive state, and reporting content size.
+@MainActor
+final class PanelBridge<Style: PanelStyle> {
+        
+    /// The backing ObservableObject that drives SwiftUI updates.
+    private let stateBridge = StateBridge()
+    
+    /// The AppKit view controller hosting the SwiftUI content.
+    public let sizingBridge: NSHostingController<BridgeView<Style>>
+        
+    init(content: AnyView, style: Style) {
+        let bridgeView = BridgeView(
+            content: content,
+            style: style,
+            stateBridge: stateBridge
+        )
+        
+        self.sizingBridge = NSHostingController(bridgeView: bridgeView)
+        self.sizingBridge.view.backgroundColor = .clear
+    }
+        
+    /// Updates the reactive state, triggering SwiftUI animations if needed.
+    func updateState(to newState: PanelState) {
+        stateBridge.state = newState
+    }
+    
+    /// Retrieves the current current reactive state.
+    var currentState: PanelState {
+        stateBridge.state
+    }
+    
+    /// Calculates the size required to fit the SwiftUI content.
+    var fittingSize: CGSize {
+        sizingBridge.view.fittingSize
+    }
+}
+
+/// Private observable source of truth.
+private class StateBridge: ObservableObject {
+    @Published var state: PanelState = .hidden
+}
+
+/// The wrapper view that injects state into the Style.
+private struct BridgeView<Style: PanelStyle>: View {
+    let content: AnyView
+    let style: Style
+    @ObservedObject var stateBridge: PanelStateBridge
+    
+    var body: some View {
+        style.contentView(content: content, state: stateBridge.state)
+    }
+}
