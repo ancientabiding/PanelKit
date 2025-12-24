@@ -3,30 +3,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "FullScreenPanel",
+    name: "PanelKit",
     platforms: [
         .macOS(.v13)
     ],
     products: [
         .library(
-            name: "FullScreenPanel",
-            targets: ["FullScreenPanel"])
+            name: "PanelKit",
+            targets: ["PanelKit"])
     ],
-    dependencies: [
-        .package(
-            url: "https://github.com/euclidaxiom/VisualEffectView.git",
-            branch: "main"
-        ),
-    ],
+    dependencies: [],
     targets: [
         .target(
-            name: "FullScreenPanel",
-            dependencies: [
-                "VisualEffectView"
-            ]),
-        .executableTarget(
-            name: "FullScreenPanelDemo",
-            dependencies: ["FullScreenPanel"],
-        ),
+            name: "PanelKit",
+            dependencies: []),
     ]
 )
