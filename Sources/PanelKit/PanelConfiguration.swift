@@ -1,6 +1,6 @@
 //
 //  PanelConfiguration.swift
-//  FullScreenPanel
+//  PanelKit
 //
 //
 //                     -(]-

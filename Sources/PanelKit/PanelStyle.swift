@@ -1,6 +1,6 @@
 //
 //  PanelStyle.swift
-//  FullScreenPanel
+//  PanelKit
 //
 //
 //                     -(]-

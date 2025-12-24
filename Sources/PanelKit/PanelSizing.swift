@@ -1,6 +1,6 @@
 //
 //  PanelSizing.swift
-//  FullScreenPanel
+//  PanelKit
 //
 //
 //                     -(]-
