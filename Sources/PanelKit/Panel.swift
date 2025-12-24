@@ -26,6 +26,25 @@ public class Panel: NSPanel {
         return _canBecomeKey
     }
     
+    // NSCoding Support
+    required public init?(coder: NSCoder) {
+        // 1. Decode sub-class properties first
+        self._canBecomeKey = coder.decodeBool(forKey: "PanelKit.canBecomeKey")
+        
+        // 2. Initialize superclass
+        super.init(coder: coder)
+        
+        // 3. Enforce architectural safety flags
+        self.isReleasedWhenClosed = false
+        self.canHide = false
+    }
+    
+    // Encodes the custom state for persistence.
+    override public func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(_canBecomeKey, forKey: "PanelKit.canBecomeKey")
+    }
+    
     /// Initializes the panel using the standard configuration.
     public init(configuration: PanelConfiguration) {
         super.init(
@@ -34,14 +53,15 @@ public class Panel: NSPanel {
             backing: .buffered,
             defer: false
         )
-
+        
+        self._canBecomeKey = configuration.canBecomeKey
+        
         self.level = configuration.level
         self.collectionBehavior = configuration.collectionBehavior
         self.isOpaque = configuration.isOpaque
         self.hasShadow = configuration.hasShadow
         self.backgroundColor = configuration.backgroundColor
         self.hidesOnDeactivate = configuration.hidesOnDeactivate
-        self._canBecomeKey = configuration.canBecomeKey
         
         // Prevent automatic release when closed to allow reuse
         self.isReleasedWhenClosed = false
