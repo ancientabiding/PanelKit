@@ -24,7 +24,7 @@ public class PanelController<Style: PanelStyle> {
     public let style: Style
     
     /// The underlying system window.
-    public let panel: NSPanel
+    public let panel: Panel
     
     /// The bridge handling SwiftUI hosting and state.
     private let bridge: PanelBridge<Style>
@@ -38,7 +38,7 @@ public class PanelController<Style: PanelStyle> {
         self.style = style
         
         // 1. Build the Window (AppKit Layer) using the Factory helper
-        self.panel = NSPanel(configuration: style.configuration)
+        self.panel = Panel(configuration: style.configuration)
         
         // 2. Build the Bridge (SwiftUI Layer)
         // Pass the user content and style to the bridge
