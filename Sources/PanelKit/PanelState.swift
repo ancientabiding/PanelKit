@@ -55,7 +55,7 @@ public enum PanelState: Equatable, Sendable {
         switch self {
         case .appearing, .dismissing:
             return true
-        default:
+        case .hidden, .presented:
             return false
         }
     }

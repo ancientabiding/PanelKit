@@ -33,7 +33,7 @@ final class PanelBridge<Style: PanelStyle> {
             stateBridge: stateBridge
         )
         
-        self.sizingBridge = NSHostingController(bridgeView: bridgeView)
+        self.sizingBridge = NSHostingController(rootView: bridgeView)
         self.sizingBridge.view.backgroundColor = .clear
     }
         
@@ -42,7 +42,7 @@ final class PanelBridge<Style: PanelStyle> {
         stateBridge.state = newState
     }
     
-    /// Retrieves the current current reactive state.
+    /// Retrieves the current reactive state.
     var currentState: PanelState {
         stateBridge.state
     }
@@ -62,7 +62,7 @@ private class StateBridge: ObservableObject {
 private struct BridgeView<Style: PanelStyle>: View {
     let content: AnyView
     let style: Style
-    @ObservedObject var stateBridge: PanelStateBridge
+    @ObservedObject var stateBridge: StateBridge
     
     var body: some View {
         style.contentView(content: content, state: stateBridge.state)
