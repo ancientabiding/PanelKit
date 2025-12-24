@@ -64,3 +64,26 @@ public struct PanelConfiguration: Sendable {
         self.canBecomeKey = canBecomeKey
     }
 }
+
+public extension NSPanel {
+    
+    /// Creates a panel configured according to the provided settings.
+    convenience init(configuration: PanelConfiguration) {
+        self.init(
+            contentRect: .zero,
+            styleMask: configuration.styleMask,
+            backing: .buffered,
+            defer: false
+        )
+        
+        self.level = configuration.level
+        self.collectionBehavior = configuration.collectionBehavior
+        self.isOpaque = configuration.isOpaque
+        self.hasShadow = configuration.hasShadow
+        self.backgroundColor = configuration.backgroundColor
+        self.hidesOnDeactivate = configuration.hidesOnDeactivate
+        
+        // Critical for custom panels: prevents the OS from killing the window automatically
+        self.canHide = false
+    }
+}

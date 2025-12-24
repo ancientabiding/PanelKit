@@ -1,5 +1,5 @@
 //
-//  PanelTransition.swift
+//  PanelPresentation.swift
 //  FullScreenPanel
 //
 //
@@ -14,9 +14,6 @@
 
 import AppKit
 import QuartzCore
-
-/// A closure that configures properties on an NSPanel instance.
-public typealias PanelConfigurator = @MainActor @Sendable (NSPanel) -> Void
 
 /// Defines the duration and timing curve for an animation.
 public struct PanelPresentationTiming: Sendable {

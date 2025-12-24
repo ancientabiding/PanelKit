@@ -1,5 +1,5 @@
 //
-//  PanelLayout.swift
+//  PanelSizing.swift
 //  FullScreenPanel
 //
 //
@@ -15,7 +15,7 @@
 import Foundation
 
 /// Defines the strategy for sizing the panel window.
-public enum PanelLayout: Sendable, Equatable {
+public enum PanelSizing: Sendable, Equatable {
     
     /// The panel ignores the content size and occupies the entire screen frame.
     case fullScreen
