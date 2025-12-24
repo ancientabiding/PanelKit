@@ -54,7 +54,7 @@ final class PanelBridge<Style: PanelStyle> {
 
 /// Private observable source of truth.
 @MainActor
-class StateBridge: ObservableObject {
+final class StateBridge: ObservableObject {
     @Published var state: PanelState = .hidden
 }
 
