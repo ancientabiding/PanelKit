@@ -28,11 +28,11 @@ public class Panel: NSPanel {
     
     // NSCoding Support
     required public init?(coder: NSCoder) {
-        // 1. Decode sub-class properties first
-        self._canBecomeKey = coder.decodeBool(forKey: "PanelKit.canBecomeKey")
-        
-        // 2. Initialize superclass
+        // 1. Initialize superclass
         super.init(coder: coder)
+        
+        // 2. Decode sub-class properties after super.init
+        self._canBecomeKey = coder.decodeBool(forKey: "PanelKit.canBecomeKey")
         
         // 3. Enforce architectural safety flags
         self.isReleasedWhenClosed = false
