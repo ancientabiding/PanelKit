@@ -24,7 +24,7 @@ final class PanelBridge<Style: PanelStyle> {
     private let stateBridge = StateBridge()
     
     /// The AppKit view controller hosting the SwiftUI content.
-    public let sizingBridge: NSHostingController<BridgeView<Style>>
+    let sizingBridge: NSHostingController<BridgeView<Style>>
         
     init(content: AnyView, style: Style) {
         let bridgeView = BridgeView(
