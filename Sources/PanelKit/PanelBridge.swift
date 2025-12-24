@@ -34,7 +34,6 @@ final class PanelBridge<Style: PanelStyle> {
         )
         
         self.sizingBridge = NSHostingController(rootView: bridgeView)
-        self.sizingBridge.view.backgroundColor = .clear
     }
         
     /// Updates the reactive state, triggering SwiftUI animations if needed.
@@ -54,12 +53,12 @@ final class PanelBridge<Style: PanelStyle> {
 }
 
 /// Private observable source of truth.
-private class StateBridge: ObservableObject {
+class StateBridge: ObservableObject {
     @Published var state: PanelState = .hidden
 }
 
 /// The wrapper view that injects state into the Style.
-private struct BridgeView<Style: PanelStyle>: View {
+struct BridgeView<Style: PanelStyle>: View {
     let content: AnyView
     let style: Style
     @ObservedObject var stateBridge: StateBridge
