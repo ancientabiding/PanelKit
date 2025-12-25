@@ -12,10 +12,12 @@ let package = Package(
             name: "PanelKit",
             targets: ["PanelKit"])
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/jeffersongreco/VisualEffectKit.git", .upToNextMajor(from: "1.0.0")),
+    ],
     targets: [
         .target(
             name: "PanelKit",
-            dependencies: []),
+            dependencies: ["VisualEffectKit"]),
     ]
 )

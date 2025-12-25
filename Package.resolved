@@ -1,0 +1,15 @@
+{
+  "originHash" : "a9f4c9189a62faf9bae1607bd58b433a95f67b48256b663019bca7c20e832edb",
+  "pins" : [
+    {
+      "identity" : "visualeffectkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jeffersongreco/VisualEffectKit.git",
+      "state" : {
+        "revision" : "7259e65ff556a167c03dbe53da074def39342ea5",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
