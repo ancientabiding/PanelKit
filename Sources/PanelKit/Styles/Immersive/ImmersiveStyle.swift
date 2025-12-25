@@ -29,7 +29,7 @@ public struct ImmersiveStyle: PanelStyle {
     
     public var configuration: PanelConfiguration {
         PanelConfiguration(
-            level: .screenSaver, // Covers Dock and Menu Bar
+            level: .screenSaver, // Covers Dock and Menu Bar, All
             collectionBehavior: [.canJoinAllSpaces, .fullScreenAuxiliary],
             styleMask: [.borderless, .nonactivatingPanel],
             isOpaque: false,
@@ -62,22 +62,19 @@ public struct ImmersiveStyle: PanelStyle {
     }
     
     public func panelView(content: AnyView, state: PanelState) -> some View {
-        if #available(macOS 14.0, *) {
-            ImmersiveStylePanelView(content: content, state: state)
-        } else {
-            // Fallback on earlier versions
-        }
+        ImmersiveStylePanelView(content: content, state: state)
     }
 }
 
-/// The visual container for the ImmersiveStyle.
-@available(macOS 14.0, *)
+/// The visual container for the ImmersiveStyle (Modern Implementation).
 private struct ImmersiveStylePanelView: View {
     private let content: AnyView
     private let state: PanelState
     
     @Environment(\.panelActions) var actions
-        
+
+    @ObservedObject var store = WallpaperService.shared.store
+    
     @State private var wallpaperURL: URL?
     
     init(content: AnyView, state: PanelState) {
@@ -87,9 +84,9 @@ private struct ImmersiveStylePanelView: View {
     
     var body: some View {
         ZStack {
-            // 1. Background Layer
+            // 1. Panel Background
             Group {
-                if let url = wallpaperURL, let wallpaper = WallpaperService.shared.store.wallpapers[url] {
+                if let url = wallpaperURL, let wallpaper = store.wallpapers[url] {
                     Image(nsImage: wallpaper)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -102,7 +99,7 @@ private struct ImmersiveStylePanelView: View {
                 actions?.dismiss()
             }
             
-            // 2. Content Layer
+            // 2. Content
             content
                 .scaleEffect(contentScale)
                 .animation(.easeOut(duration: 0.9), value: state)
@@ -118,12 +115,11 @@ private struct ImmersiveStylePanelView: View {
     }
     
     private var contentScale: CGFloat {
-        // Subtle zoom effect: Start slightly larger (1.1) and zoom in to 1.0
         switch state {
-        case .hidden: return 1.1
-        case .appearing: return 1.0
-        case .presented: return 1.0
-        case .dismissing: return 1.1
+        case .hidden, .dismissing:
+            return 1.1
+        case .presented, .appearing:
+            return 1.0
         }
     }
 }

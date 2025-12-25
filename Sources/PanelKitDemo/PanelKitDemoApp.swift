@@ -15,7 +15,6 @@
 import SwiftUI
 import PanelKit
 
-@available(macOS 13.0, *)
 @main
 struct PanelKitDemoApp: App {
     
@@ -34,7 +33,6 @@ struct PanelKitDemoApp: App {
             DemoControlView()
                 .frame(width: 300, height: 200)
         }
-        .windowResizability(.contentSize)
     }
 }
 
@@ -47,15 +45,6 @@ struct DemoControlView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            if #available(macOS 14.0, *) {
-                Image(systemName: "macwindow.on.rectangle")
-                    .font(.system(size: 50))
-                    .foregroundStyle(.blue)
-                    .symbolEffect(.bounce, value: panel != nil)
-            } else {
-                // Fallback on earlier versions
-            }
-            
             Text("PanelKit Demo")
                 .font(.headline)
             
