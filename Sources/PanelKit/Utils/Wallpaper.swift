@@ -17,7 +17,8 @@ import ImageIO
 
 /// A thread-safe utility to fetch and cache desktop wallpapers efficiently.
 /// optimized for performance using ImageIO downsampling and memory constraints.
-actor Wallpaper {
+@MainActor
+final class Wallpaper {
     
     /// The singleton instance.
     static let shared = Wallpaper()
@@ -52,10 +53,17 @@ actor Wallpaper {
         }
         
         // 3. Load & Downsample (Performance Path)
-        // Using ImageIO to decode directly to the target size, skipping the full 5K load.
-        if let downsampledImage = createThumbnail(from: url, maxPixelSize: targetWidth) {
-            cache.setObject(downsampledImage, forKey: key)
-            return downsampledImage
+        // Offload to background to avoid blocking Main Thread
+        let maxPixelSize = targetWidth
+        
+        let result = await Task.detached(priority: .userInitiated) {
+            let image = Self.createThumbnail(from: url, maxPixelSize: maxPixelSize)
+            return SendableImage(image)
+        }.value
+        
+        if let image = result.image {
+            cache.setObject(image, forKey: key)
+            return image
         }
         
         return nil
@@ -68,7 +76,7 @@ actor Wallpaper {
         
     /// Reads an image from disk and decodes it directly into a smaller size.
     /// This avoids loading the full-resolution image into RAM.
-    private func createThumbnail(from url: URL, maxPixelSize: CGFloat) -> NSImage? {
+    nonisolated private static func createThumbnail(from url: URL, maxPixelSize: CGFloat) -> NSImage? {
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true, // Respects EXIF orientation
@@ -89,4 +97,10 @@ actor Wallpaper {
         // Convert back to AppKit object
         return NSImage(cgImage: cgImage, size: NSSize(width: CGFloat(cgImage.width), height: CGFloat(cgImage.height)))
     }
+}
+
+/// Helper to safely transfer NSImage across concurrency domains
+private struct SendableImage: @unchecked Sendable {
+    let image: NSImage?
+    init(_ image: NSImage?) { self.image = image }
 }
