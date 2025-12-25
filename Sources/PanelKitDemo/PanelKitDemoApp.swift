@@ -56,15 +56,6 @@ struct DemoControlView: View {
                 // Fallback on earlier versions
             }
             
-            if #available(macOS 14.0, *) {
-                Image(systemName: "macwindow.on.rectangle")
-                    .font(.system(size: 50))
-                    .foregroundStyle(.blue)
-                    .symbolEffect(.bounce, value: panel != nil)
-            } else {
-                // Fallback on earlier versions
-            }
-            
             Text("PanelKit Demo")
                 .font(.headline)
             

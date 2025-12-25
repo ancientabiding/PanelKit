@@ -42,6 +42,12 @@ public class PanelController<Style: PanelStyle> {
         // 2. Resolve "Self" Cycle
         let proxy = DismissalProxy()
         let actions = PanelActions(dismiss: {
+            // DOCUMENTATION:
+            // Although we are likely on the main thread, the closure signature
+            // of `PanelActions` is non-isolated (@Sendable).
+            // Since `proxy.perform()` is isolated to @MainActor, we must
+            // explicitly dispatch the call via a Task to satisfy compiler safety checks
+            // and allow `dismiss()` to be called from background threads by consumers.
             Task { @MainActor in
                 proxy.perform()
             }

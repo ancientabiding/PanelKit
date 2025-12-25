@@ -30,7 +30,6 @@ final class PanelBridge<Style: PanelStyle> {
         let bridgeView = BridgeView(
             content: content,
             style: style,
-            bridge: self,
             actions: actions,
             stateBridge: stateBridge
         )
@@ -64,7 +63,6 @@ final class StateBridge: ObservableObject {
 struct BridgeView<Style: PanelStyle>: View {
     let content: AnyView
     let style: Style
-    weak var bridge: PanelBridge<Style>?
     let actions: PanelActions?
     @ObservedObject var stateBridge: StateBridge
     

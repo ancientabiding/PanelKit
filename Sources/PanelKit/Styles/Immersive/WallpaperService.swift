@@ -32,6 +32,8 @@ public final class WallpaperService {
     
     private var observers: Set<AnyCancellable> = []
     
+    private var processingURLs: Set<URL> = []
+    
     /// Cache to store processed images in memory.
     /// Key: NSURL (Uniquely identifies the wallpaper file, handling Spaces correctly).
     private let cache = NSCache<NSURL, NSImage>()
@@ -87,13 +89,15 @@ public final class WallpaperService {
             // Passo 2 (O SEU FILTRO INTELIGENTE):
             // Se já temos essa URL processada no Store, ignoramos o gatilho.
             // Isso responde à sua pergunta: aqui nós "observamos" se a URL mudou de fato.
-            if store.wallpapers[url] != nil { continue }
+            if store.wallpapers[url] != nil || processingURLs.contains(url) { continue }
+            processingURLs.insert(url)
             
             // Passo 3: Se é nova, processamos em background
             Task {
                 if let image = await processWallpaper(from: url) {
-                    self.store.wallpapers[url] = image
+                    self.store.update(image, for: url)
                 }
+                self.processingURLs.remove(url)
             }
         }
     }

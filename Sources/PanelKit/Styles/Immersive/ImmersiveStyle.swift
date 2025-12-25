@@ -77,9 +77,7 @@ private struct ImmersiveStylePanelView: View {
     private let state: PanelState
     
     @Environment(\.panelActions) var actions
-    
-    private var store = WallpaperService.shared.store
-    
+        
     @State private var wallpaperURL: URL?
     
     init(content: AnyView, state: PanelState) {
@@ -91,7 +89,7 @@ private struct ImmersiveStylePanelView: View {
         ZStack {
             // 1. Background Layer
             Group {
-                if let url = wallpaperURL, let wallpaper = store.wallpapers[url] {
+                if let url = wallpaperURL, let wallpaper = WallpaperService.shared.store.wallpapers[url] {
                     Image(nsImage: wallpaper)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -112,6 +110,7 @@ private struct ImmersiveStylePanelView: View {
                 .onTapGesture { /* block dismiss when tapping content */ }
         }
         .task {
+            // the wallpaper never changes while the panel is displayed
             if let screen = NSScreen.main {
                 self.wallpaperURL = NSWorkspace.shared.desktopImageURL(for: screen)
             }
