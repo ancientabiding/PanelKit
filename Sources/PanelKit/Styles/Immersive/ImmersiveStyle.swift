@@ -61,23 +61,37 @@ public struct ImmersiveStyle: PanelStyle {
         )
     }
     
-    public func contentView(content: AnyView, state: PanelState) -> some View {
-        ImmersivePanel(content: content, state: state)
+    public func panelView(content: AnyView, state: PanelState) -> some View {
+        if #available(macOS 14.0, *) {
+            ImmersiveStylePanelView(content: content, state: state)
+        } else {
+            // Fallback on earlier versions
+        }
     }
 }
 
 /// The visual container for the ImmersiveStyle.
-struct ImmersivePanel: View {
-    let content: AnyView
-    let state: PanelState
+@available(macOS 14.0, *)
+private struct ImmersiveStylePanelView: View {
+    private let content: AnyView
+    private let state: PanelState
     
-    @State private var wallpaper: NSImage?
+    @Environment(\.panelActions) var actions
+    
+    private var store = WallpaperService.shared.store
+    
+    @State private var wallpaperURL: URL?
+    
+    init(content: AnyView, state: PanelState) {
+            self.content = content
+            self.state = state
+        }
     
     var body: some View {
         ZStack {
             // 1. Background Layer
             Group {
-                if let wallpaper {
+                if let url = wallpaperURL, let wallpaper = store.wallpapers[url] {
                     Image(nsImage: wallpaper)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -86,15 +100,20 @@ struct ImmersivePanel: View {
                 
                 VisualEffectView(material: .fullScreenUI)
             }
+            .onTapGesture {
+                actions?.dismiss()
+            }
             
             // 2. Content Layer
             content
                 .scaleEffect(contentScale)
-                .animation(.easeOut(duration: 0.6), value: state)
+                .animation(.easeOut(duration: 0.9), value: state)
+                .allowsHitTesting(state == .presented)
+                .onTapGesture { /* block dismiss when tapping content */ }
         }
         .task {
             if let screen = NSScreen.main {
-                self.wallpaper = await Wallpaper.shared.get(for: screen)
+                self.wallpaperURL = NSWorkspace.shared.desktopImageURL(for: screen)
             }
         }
     }

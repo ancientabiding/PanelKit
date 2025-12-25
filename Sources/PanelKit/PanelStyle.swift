@@ -44,5 +44,5 @@ public protocol PanelStyle: Sendable {
     ///   - state: The current lifecycle state of the window.
     /// - Returns: A fully configured SwiftUI View.
     @ViewBuilder
-    func contentView(content: AnyView, state: PanelState) -> Panel
+    func panelView(content: AnyView, state: PanelState) -> Panel
 }

@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "PanelKit",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v12)
     ],
     products: [
         .library(
@@ -19,5 +19,8 @@ let package = Package(
         .target(
             name: "PanelKit",
             dependencies: ["VisualEffectKit"]),
+        .executableTarget(
+            name: "PanelKitDemo",
+            dependencies: ["PanelKit"])
     ]
 )
