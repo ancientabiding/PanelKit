@@ -30,13 +30,16 @@ public struct ImmersiveStyle: PanelStyle {
     public var configuration: PanelConfiguration {
         PanelConfiguration(
             level: .screenSaver, // Covers Dock and Menu Bar, All
-            collectionBehavior: [.canJoinAllSpaces, .fullScreenAuxiliary],
-            styleMask: [.borderless, .nonactivatingPanel],
+            collectionBehavior: [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenAuxiliary],
+            styleMask: [.fullSizeContentView, .nonactivatingPanel],
             isOpaque: false,
             hasShadow: false,
             backgroundColor: .clear,
             hidesOnDeactivate: false,
-            canBecomeKey: true
+            titleVisibility: .hidden,
+            titlebarAppearsTransparent: true,
+            canBecomeKey: true,
+            becomesKeyOnlyIfNeeded: false
         )
     }
     
