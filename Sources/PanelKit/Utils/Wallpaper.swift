@@ -23,8 +23,6 @@ actor Wallpaper {
     static let shared = Wallpaper()
         
     /// The maximum width (in pixels) for the cached wallpaper.
-    /// Since the image will be blurred/dimmed, we don't need the full 5K resolution.
-    /// 1200px is sufficient for quality while keeping memory usage under ~5MB per image.
     private let targetWidth: CGFloat = 720
         
     /// Cache to store processed images in memory.
@@ -32,10 +30,7 @@ actor Wallpaper {
     private let cache = NSCache<NSURL, NSImage>()
     
     private init() {
-        // MEMORY SAFETY:
-        // Limit the cache to hold only the last 6 wallpapers.
-        // This covers multi-monitor setups + a few spaces history.
-        // If the user exceeds this, the oldest image is automatically purged.
+        // Limit the cache to hold only this maximum images at same time.
         cache.countLimit = 4
     }
         
