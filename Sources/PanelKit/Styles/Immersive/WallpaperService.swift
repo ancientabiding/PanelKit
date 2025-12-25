@@ -12,6 +12,8 @@
 //                      `
 //
 
+// TODO: Think on a good monitoring for SandBoxed apps
+
 import AppKit
 import ImageIO
 import Combine
@@ -32,6 +34,10 @@ public final class WallpaperService {
     
     private var processingURLs: Set<URL> = []
     
+    private var databaseMonitor: DispatchSourceFileSystemObject?
+    
+    private var databaseFileDescriptor: Int32 = -1
+    
     private let cache = NSCache<NSURL, NSImage>()
     
     private init() {
@@ -42,6 +48,7 @@ public final class WallpaperService {
         guard observers.isEmpty else { return }
         
         setupObservers()
+        setupFileMonitor()
         refreshAllScreens()
     }
     
@@ -50,26 +57,65 @@ public final class WallpaperService {
     }
     
     private func setupObservers() {
-        let center = NSWorkspace.shared.notificationCenter
-        let notificationCenter = NotificationCenter.default
+        let wsCenter = NSWorkspace.shared.notificationCenter
+        let appCenter = NotificationCenter.default
+        let distCenter = DistributedNotificationCenter.default()
         
-        center.publisher(for: NSWorkspace.activeSpaceDidChangeNotification)
+        wsCenter.publisher(for: NSWorkspace.activeSpaceDidChangeNotification)
             .sink { [weak self] _ in self?.refreshAllScreens() }
             .store(in: &observers)
         
-        center.publisher(for: Notification.Name("NSWorkspaceDesktopImageDidChangeNotification"))
+        appCenter.publisher(for: NSApplication.didChangeScreenParametersNotification)
             .sink { [weak self] _ in self?.refreshAllScreens() }
             .store(in: &observers)
+
+        distCenter.addObserver(self, selector: #selector(handleDistributedChange), name: Notification.Name("com.apple.desktop.backgroundChanged"), object: nil)
+    }
+    
+    @objc private func handleDistributedChange() {
+        Task { @MainActor in self.refreshAllScreens() }
+    }
+    
+    private func setupFileMonitor() {
+        guard let libraryDir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return }
         
-        notificationCenter.publisher(for: NSApplication.didChangeScreenParametersNotification)
-            .sink { [weak self] _ in self?.refreshAllScreens() }
-            .store(in: &observers)
+        let dockDir = libraryDir.appendingPathComponent("Dock")
+        let dbPath = dockDir.appendingPathComponent("desktoppicture.db")
+        
+        guard FileManager.default.fileExists(atPath: dbPath.path) else { return }
+        
+        let fd = open(dbPath.path, O_EVTONLY)
+        guard fd >= 0 else {
+            print("PanelKit: Wallpaper DB monitoring disabled (Sandbox restriction). Using notifications fallback.")
+            return
+        }
+        
+        self.databaseFileDescriptor = fd
+        
+        let source = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: fd,
+            eventMask: [.write, .extend, .delete, .rename],
+            queue: DispatchQueue.global(qos: .utility)
+        )
+        
+        source.setEventHandler { [weak self] in
+            Task { @MainActor in
+                self?.refreshAllScreens()
+            }
+        }
+        
+        source.setCancelHandler {
+            close(fd)
+        }
+        
+        source.resume()
+        self.databaseMonitor = source
     }
     
     private func refreshAllScreens() {
         for screen in NSScreen.screens {
             guard let url = NSWorkspace.shared.desktopImageURL(for: screen) else { continue }
-            
+
             if store.wallpapers[url] != nil || processingURLs.contains(url) { continue }
             processingURLs.insert(url)
             
