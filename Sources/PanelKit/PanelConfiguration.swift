@@ -41,8 +41,17 @@ public struct PanelConfiguration: Sendable {
     /// Indicates if the panel should hide when the application loses focus.
     public var hidesOnDeactivate: Bool
     
+    /// Hides the window title visibility (usually .hidden for panels).
+    public var titleVisibility: NSWindow.TitleVisibility
+    
+    /// Makes the title bar area transparent, allowing content to extend into it.
+    public var titlebarAppearsTransparent: Bool
+    
     /// Indicates if the panel accepts keyboard focus even if it has a `.nonactivatingPanel` style mask.
     public var canBecomeKey: Bool
+    
+    /// Determines if the window becomes key only when user clicks it (false = becomes key immediately on orderFront).
+    public var becomesKeyOnlyIfNeeded: Bool
     
     public init(
         level: NSWindow.Level,
@@ -52,7 +61,10 @@ public struct PanelConfiguration: Sendable {
         hasShadow: Bool,
         backgroundColor: NSColor,
         hidesOnDeactivate: Bool,
-        canBecomeKey: Bool
+        titleVisibility: NSWindow.TitleVisibility,
+        titlebarAppearsTransparent: Bool,
+        canBecomeKey: Bool,
+        becomesKeyOnlyIfNeeded: Bool
     ) {
         self.level = level
         self.collectionBehavior = collectionBehavior
@@ -61,6 +73,9 @@ public struct PanelConfiguration: Sendable {
         self.hasShadow = hasShadow
         self.backgroundColor = backgroundColor
         self.hidesOnDeactivate = hidesOnDeactivate
+        self.titleVisibility = titleVisibility
+        self.titlebarAppearsTransparent = titlebarAppearsTransparent
         self.canBecomeKey = canBecomeKey
+        self.becomesKeyOnlyIfNeeded = becomesKeyOnlyIfNeeded
     }
 }

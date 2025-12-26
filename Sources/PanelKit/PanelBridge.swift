@@ -26,10 +26,11 @@ final class PanelBridge<Style: PanelStyle> {
     /// The AppKit view controller hosting the SwiftUI content.
     let sizingBridge: NSHostingController<BridgeView<Style>>
         
-    init(content: AnyView, style: Style) {
+    init(content: AnyView, style: Style, actions: PanelActions?) {
         let bridgeView = BridgeView(
             content: content,
             style: style,
+            actions: actions,
             stateBridge: stateBridge
         )
         
@@ -62,9 +63,11 @@ final class StateBridge: ObservableObject {
 struct BridgeView<Style: PanelStyle>: View {
     let content: AnyView
     let style: Style
+    let actions: PanelActions?
     @ObservedObject var stateBridge: StateBridge
     
     var body: some View {
-        style.contentView(content: content, state: stateBridge.state)
+        style.panelView(content: content, state: stateBridge.state)
+            .environment(\.panelActions, actions)
     }
 }
