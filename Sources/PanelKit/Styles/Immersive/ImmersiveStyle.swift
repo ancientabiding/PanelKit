@@ -25,7 +25,15 @@ import VisualEffectKit
 /// - Borderless and immersive.
 public struct ImmersiveStyle: PanelStyle {
     
-    public init() {}
+    private let imageController: ImageController
+    
+    public init(backgroundImage: NSImage? = nil) {
+        self.imageController = ImageController(initialImage: backgroundImage)
+    }
+    
+    public func updateBackgroundImage(to image: NSImage?) {
+        imageController.update(to: image)
+    }
     
     public var configuration: PanelConfiguration {
         PanelConfiguration(
@@ -65,38 +73,29 @@ public struct ImmersiveStyle: PanelStyle {
     }
     
     public func panelView(content: AnyView, state: PanelState) -> some View {
-        ImmersiveStylePanelView(content: content, state: state)
+        ImmersiveStylePanelView(content: content, imageController: imageController, state: state)
     }
 }
 
-/// The visual container for the ImmersiveStyle (Modern Implementation).
 private struct ImmersiveStylePanelView: View {
-    private let content: AnyView
-    private let state: PanelState
+    let content: AnyView
+    @ObservedObject var imageController: ImageController
+    let state: PanelState
     
     @Environment(\.panelActions) var actions
-
-    @ObservedObject var store = WallpaperService.shared.store
-    
-    @State private var wallpaperURL: URL?
-    
-    init(content: AnyView, state: PanelState) {
-            self.content = content
-            self.state = state
-        }
     
     var body: some View {
         ZStack {
             // 1. Panel Background
             Group {
-                if let url = wallpaperURL, let wallpaper = store.wallpapers[url] {
-                    Image(nsImage: wallpaper)
+                if let nsImage = imageController.currentImage {
+                    Image(nsImage: nsImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .ignoresSafeArea()
+                        .transition(.opacity.animation(.easeOut))
                 }
                 
-                VisualEffectView(material: .fullScreenUI)
+                VisualEffectView(material: .fullScreenUI, blendingMode: .withinWindow)
             }
             .onTapGesture {
                 actions?.dismiss()
@@ -110,12 +109,6 @@ private struct ImmersiveStylePanelView: View {
                 .contentShape(Rectangle())
                 .onTapGesture { } // Consumes tap to prevent propagation
         }
-        .task {
-            // the wallpaper never changes while the panel is displayed
-            if let screen = NSScreen.main {
-                self.wallpaperURL = NSWorkspace.shared.desktopImageURL(for: screen)
-            }
-        }
     }
     
     private var contentScale: CGFloat {
@@ -125,5 +118,32 @@ private struct ImmersiveStylePanelView: View {
         case .presented, .appearing:
             return 1.0
         }
+    }
+}
+
+/// Gerencia o armazenamento e atualização da imagem de fundo.
+@MainActor
+public class ImageController: ObservableObject {
+    /// A imagem atual em cache (memória).
+    @Published public private(set) var currentImage: NSImage?
+    
+    public init(initialImage: NSImage? = nil) {
+        self.currentImage = initialImage
+    }
+    
+    /// Atualiza a imagem de fundo. Isso notificará automaticamente o painel para redesenhar.
+    /// - Parameter image: A nova imagem a ser exibida ou nil para remover.
+    public func update(to image: NSImage?) {
+        // Evita atualizações desnecessárias se for a mesma referência
+        guard image !== currentImage else { return }
+        
+        withAnimation(.easeOut(duration: 0.3)) {
+            self.currentImage = image
+        }
+    }
+    
+    /// Limpa o cache da imagem explicitamente.
+    public func clear() {
+        self.update(to: nil)
     }
 }

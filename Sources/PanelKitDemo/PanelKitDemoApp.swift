@@ -21,8 +21,6 @@ struct PanelKitDemoApp: App {
     @State private var panel: PanelController<ImmersiveStyle>?
     
     init() {
-        WallpaperService.shared.start()
-        
         let content = ContentView()
         let controller = PanelController(
             style: ImmersiveStyle(),
@@ -60,7 +58,6 @@ struct DemoView: View {
         .padding()
     }
 }
-
 
 struct ContentView: View {
     var body: some View {
