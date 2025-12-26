@@ -68,8 +68,14 @@ public final class WallpaperService {
         appCenter.publisher(for: NSApplication.didChangeScreenParametersNotification)
             .sink { [weak self] _ in self?.refreshAllScreens() }
             .store(in: &observers)
-
-        distCenter.addObserver(self, selector: #selector(handleDistributedChange), name: Notification.Name("com.apple.desktop.backgroundChanged"), object: nil)
+        
+        let distName = Notification.Name("com.apple.desktop.backgroundChanged")
+        distCenter.addObserver(self, selector: #selector(handleDistributedChange), name: distName, object: nil)
+        
+        AnyCancellable { [weak self] in
+            distCenter.removeObserver(self as Any, name: distName, object: nil)
+        }
+        .store(in: &observers)
     }
     
     @objc private func handleDistributedChange() {
@@ -115,7 +121,7 @@ public final class WallpaperService {
     private func refreshAllScreens() {
         for screen in NSScreen.screens {
             guard let url = NSWorkspace.shared.desktopImageURL(for: screen) else { continue }
-
+            
             if store.wallpapers[url] != nil || processingURLs.contains(url) { continue }
             processingURLs.insert(url)
             
