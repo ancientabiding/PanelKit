@@ -18,7 +18,7 @@ import PanelKit
 @main
 struct PanelKitDemoApp: App {
     
-    @State private var panel: PanelController<ImmersiveStyle>?
+    private let panel: PanelController<ImmersiveStyle>
     
     init() {
         let content = ContentView()
@@ -26,7 +26,7 @@ struct PanelKitDemoApp: App {
             style: ImmersiveStyle(),
             content: AnyView(content)
         )
-        _panel = State(initialValue: controller)
+        panel = controller
     }
     
     var body: some Scene {
@@ -37,7 +37,7 @@ struct PanelKitDemoApp: App {
     }
     
     func presentPanel() {
-        panel?.present()
+        panel.present()
     }
 }
 
