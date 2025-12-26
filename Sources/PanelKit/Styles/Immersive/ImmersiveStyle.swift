@@ -107,7 +107,8 @@ private struct ImmersiveStylePanelView: View {
                 .scaleEffect(contentScale)
                 .animation(.easeOut(duration: 0.9), value: state)
                 .allowsHitTesting(state == .presented)
-                .onTapGesture { /* block dismiss when tapping content */ }
+                .contentShape(Rectangle())
+                .onTapGesture { } // Consumes tap to prevent propagation
         }
         .task {
             // the wallpaper never changes while the panel is displayed
